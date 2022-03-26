@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -O2
 
-all: raid diar test
+all: raid diar
 
 %: %.c
 	$(CC) $(CFLAGS) -o $@ $<

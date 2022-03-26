@@ -14,10 +14,22 @@
 #define MASK 128
 
 char encodings[NUM_ENCODINGS] = { 
-  0x0, 0x69, 0x2a, 0x43,
-  0x4c, 0x25, 0x66, 0xf,
-  0x70, 0x19, 0x5a, 0x33,
-  0x3c, 0x55, 0x16, 0x7f
+  0x0, 
+  0x69, 
+  0x2a, 
+  0x43,
+  0x4c, 
+  0x25, 
+  0x66, 
+  0xf,
+  0x70, 
+  0x19, 
+  0x5a, 
+  0x33,
+  0x3c, 
+  0x55, 
+  0x16, 
+  0x7f
 };
   
 int main(int argc, char* argv[]) {
@@ -35,7 +47,7 @@ int main(int argc, char* argv[]) {
   FILE *files [NUM_FILES];
   for (int i = 0; i < NUM_FILES; i++) {
     char fname[FILENAME_BUFFER];
-    sprintf(fname, "%s._part%d", filename, i);
+    sprintf(fname, "%s.part%d", filename, i);
     if ((files[i] = fopen(fname, "wb")) == NULL) {
       printf("Error Creating File. Shutting Down.\n");
       exit(1);
@@ -64,21 +76,21 @@ int main(int argc, char* argv[]) {
     bytes_array[nibbles_processed++] = encodings[current_byte & 0xf];
   
     if (nibbles_processed == ENCODING_LENGTH + 1) {
+
       int left_adjustment = 1;
       int current_file = 0;
 
       while (current_file < NUM_FILES) {
-
-        for (int i = 0; i < TABLE_ROWS; i++) {
+      
+      //left shit all values by 1 bit
+        for (int i = 0; i < TABLE_ROWS; i++) 
           bytes_array[i] <<= left_adjustment;
-        }
 
         char byte_to_write = 0x00;
 
-        for (int i = 0; i < TABLE_ROWS; i++) {
+        for (int i = 0; i < TABLE_ROWS; i++) 
           byte_to_write |= (bytes_array[i] >> i) & (MASK >> i);
-        }
-
+       
         file_output_buffers[current_file][bytes_processed] = byte_to_write;
 
         current_file += 1;

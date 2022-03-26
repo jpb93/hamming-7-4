@@ -10,6 +10,7 @@
 #define NUM_FILES 7
 #define FILENAME_BUFFER 64
 #define NUM_ENCODINGS 16
+#define CORRUPTED -1
 
 int main(int argc, char* argv[]) {
   char* filename = argv[2];
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
   printf("Opening files...\n");
   for (int i = 0; i < NUM_FILES; i++) {
     char fname[FILENAME_BUFFER];
-    sprintf(fname, "%s._part%d", filename, i);
+    sprintf(fname, "%s.part%d", filename, i);
     if ((files[i] = fopen(fname, "rb")) == NULL) {
       printf("Error Reading File. Shutting Down.\n");
       exit(1);
@@ -34,7 +35,14 @@ int main(int argc, char* argv[]) {
   char lines_processed = 0;
   char bytes_processed = 0;
 
-  //do {
+  int encoded_bytes[NUM_FILES];
+
+  for (int i = NUM_FILES; i >= 0; i--) {
+    encoded_bytes[i] = fgetc(files[i]);
+  }
+
+  // encoded_bytes now has 7 bytes within it
+
     char file_bytes[NUM_FILES];
     for (int i = 0; i < NUM_FILES; i++){
       file_bytes[i] = fgetc(files[i]);
