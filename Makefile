@@ -7,4 +7,4 @@ all: raid diar
 	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f a.out *.part? *.2 *._* *.exe *.--*
+	rm -f a.out *.part? *.2 *.exe 

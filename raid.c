@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <unistd.h>
   
 #define NIBBLE_SIZE 4
 #define NUM_PARITY_BITS 3
@@ -14,29 +15,31 @@
 #define MASK 128
 
 char encodings[NUM_ENCODINGS] = { 
-  0x0, 
-  0x69, 
-  0x2a, 
-  0x43,
-  0x4c, 
-  0x25, 
-  0x66, 
-  0xf,
-  0x70, 
-  0x19, 
-  0x5a, 
-  0x33,
-  0x3c, 
-  0x55, 
-  0x16, 
-  0x7f
+  0x0, 0x69, 0x2a, 0x43,
+  0x4c, 0x25, 0x66, 0xf,
+  0x70, 0x19, 0x5a, 0x33,
+  0x3c, 0x55, 0x16, 0x7f
 };
   
 int main(int argc, char* argv[]) {
 
-  // open files to read from
-  char* filename = argv[2];
-  FILE *file_input_stream = fopen(filename, "rb");
+   char filename[FILENAME_BUFFER];
+   FILE *file_input_stream;
+   // get options
+   int option;
+   while ((option = getopt(argc, argv, "f:")) != -1) {
+     switch(option) {
+       case 'f':
+         file_input_stream = fopen(optarg, "rb");
+         strcpy(filename, optarg);
+         break;
+       case '?':
+         exit(1);
+         break;
+       default:
+         abort();
+     }
+   }
 
   if (file_input_stream == NULL) {
     printf("File Not Found. Shutting Down.\n");
@@ -46,8 +49,12 @@ int main(int argc, char* argv[]) {
   // open seven files to write to
   FILE *files [NUM_FILES];
   for (int i = 0; i < NUM_FILES; i++) {
-    char fname[FILENAME_BUFFER];
-    sprintf(fname, "%s.part%d", filename, i);
+    char* part = ".part";
+
+    // prevent concerns of not enough space
+    char fname[FILENAME_BUFFER + sizeof(part)];
+    sprintf(fname, "%s%s%d", filename, part, i);
+    
     if ((files[i] = fopen(fname, "wb")) == NULL) {
       printf("Error Creating File. Shutting Down.\n");
       exit(1);
@@ -82,7 +89,7 @@ int main(int argc, char* argv[]) {
 
       while (current_file < NUM_FILES) {
       
-      //left shit all values by 1 bit
+        //left shit all values by 1 bit
         for (int i = 0; i < TABLE_ROWS; i++) 
           bytes_array[i] <<= left_adjustment;
 
@@ -90,7 +97,7 @@ int main(int argc, char* argv[]) {
 
         for (int i = 0; i < TABLE_ROWS; i++) 
           byte_to_write |= (bytes_array[i] >> i) & (MASK >> i);
-       
+
         file_output_buffers[current_file][bytes_processed] = byte_to_write;
 
         current_file += 1;
